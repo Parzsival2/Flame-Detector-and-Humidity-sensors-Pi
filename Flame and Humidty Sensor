@@ -1,0 +1,35 @@
+import Adafruit_DHT
+import RPi.GPIO as GPIO
+from gpiozero import Buzzer
+import time
+
+#GPIO SETUP
+channel = 21
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(12, GPIO.OUT)
+buzzer = GPIO.PWM(12, 100)
+GPIO.setup(channel, GPIO.IN)
+
+DHT_SENSOR = Adafruit_DHT.DHT22
+DHT_PIN = 4
+DHT_PIN2 = 17
+
+#Works the Flame sensor
+def callback(channel):
+    print("flame detected")
+    buzzer.start(1)
+
+GPIO.add_event_detect(channel, GPIO.BOTH, bouncetime=300)  # let us know when t>
+GPIO.add_event_callback(channel, callback)  # assign function to GPIO PIN, Run >
+
+#Works the Humidity sensors(loops infinitely)
+while True:
+    humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
+    humidity2, temperature2 = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN2)
+    if humidity is not None and temperature is not None:
+        print("Sensor1:", "Temp={0:0.1f}*C  Humidity={1:0.1f}%".format(temperat>
+        print("Sensor2:", "Temp={0:0.1f}*C  Humidity={1:0.1f}%".format(temperat>
+        time.sleep(2)
+    else:
+        print("Failed to retrieve data from humidity sensor")
